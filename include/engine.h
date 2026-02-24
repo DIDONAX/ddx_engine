@@ -1,16 +1,12 @@
 #pragma once
 
-#include <unordered_map>
-#include <variant>
 #include <vector>
 
-#include "forces.h"
-#include "object.h"
 #include "solver.h"
 #include "types.h"
 
 struct Engine {
-    std::unordered_map<Object*, Forces> system_;
+    System system_;
     EulerSolver* solver_;
 
     Engine(EulerSolver& solver);

@@ -13,7 +13,6 @@ const System& Engine::get_sys() const {
 }
 
 void Engine::step() {
-    // std::println("applying forces...");
     for (auto& [o, fs] : system_) {
         for (Force& force : fs) {
             if (force.has_value()) {
@@ -23,10 +22,7 @@ void Engine::step() {
             }
         }
     }
-    // std::println("solving ode...");
     for (auto& [o, _] : system_) {
             solver_->solve(o);
-            // std::println("x = {}, y = {}", o->p_.x_, o->p_.y_);
     }
-    // std::println("step complete");
 }
