@@ -21,13 +21,28 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(SDL3)
 
-
+#DEMO
 add_executable(orbit exe/orbit.cpp ${SOURCES})
 add_executable(test exe/test.cpp ${SOURCES})
 
 include_directories(engine/include)
 
-target_link_libraries(orbit_demo PRIVATE SDL3::SDL3)
+target_link_libraries(orbit PRIVATE SDL3::SDL3)
 target_link_libraries(test PRIVATE SDL3::SDL3)
+
+#BENCHMARK
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(
+    google_benchmark 
+    GIT_REPOSITORY https://github.com/google/benchmark.git 
+    GIT_TAG main
+    SOURCE_DIR deps/google
+)
+FetchContent_MakeAvailable(google_benchmark)
+
+add_executable(bench benchmark/bench.cpp ${SOURCES})
+target_link_libraries(bench PRIVATE SDL3::SDL3 benchmark::benchmark)
+
+
 
 

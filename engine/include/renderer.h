@@ -8,25 +8,25 @@
 #include "types.h"
 #include <vector>
 
-class Renderer {
-    public:
-        Renderer(int scale); 
+struct Renderer {
+    Renderer(int scale); 
 
-        ~Renderer();
+    ~Renderer();
 
-        void render(const System& objs);
-        SDL_Window* get_window() const;
-        SDL_Renderer* data() const;
+    void clear() const; 
+    void draw(RObject& o) const;
+    void render() const; 
+    SDL_Window* get_window() const;
+    SDL_Renderer* data() const;
 
-    private:
-        SDL_Window* window_;
-        SDL_Renderer* renderer_;
-        int scale_;
-        vec2 center_;
+    SDL_Window* window_;
+    SDL_Renderer* renderer_;
+    int scale_;
+    vec2 center_;
 
-        void init_window();
+    void init_window();
 
-        void init_sdl();
+    void init_sdl();
 
-        void cleanup(); 
+    void cleanup(); 
 };

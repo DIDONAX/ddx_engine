@@ -1,43 +1,54 @@
+#include "constants.h"
 #include "engine.h"
+#include "object.h"
 #include "renderer.h"
 #include "simulation.h"
 #include "solver.h"
 
 int main() {
-    float dt = 0.01;
+
+    //smaller step size = more accurate simulation
+    float dt = 0.0009;
     float n = 1;
+    int scale = 300;
 
     EulerSolver solver(dt, n); 
     Engine e(solver);
-    Renderer r;
+    Renderer r(scale);
 
-    //scaled down values (G = 1)
-    Object sun     {5000.0f, {0.0f, 0.0f},   {0.0f, 0.0f},  {0.0f, 0.0f}};
-    Object mercury {0.16f,   {60.0f, 0.0f},  {0.0f, 9.13f}, {0.0f, 0.0f}};
-    Object venus   {2.45f,   {110.0f, 0.0f}, {0.0f, 6.74f}, {0.0f, 0.0f}};
-    Object earth   {3.0f,    {170.0f, 0.0f}, {0.0f, 5.42f}, {0.0f, 0.0f}};
-    Object mars    {0.32f,   {240.0f, 0.0f}, {0.0f, 4.56f}, {0.0f, 0.0f}}; 
-    Object jupiter {318.0f,  {400.0f, 0.0f}, {0.0f, 3.53f}, {0.0f, 0.0f}};
+    // G = 1, sun mass = 1
+    Object sun     {1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}};
+    Object mercury {0.0000033f, {0.39f, 0.0f}, {0.0f, 1.60f}, {0.0f, 0.0f}};
+    Object venus   {0.0000245f, {0.72f, 0.0f}, {0.0f, 1.18f}, {0.0f, 0.0f}};
+    Object earth   {0.00003f, {1.0f, 0.0f}, {0.0f, 1.00f}, {0.0f, 0.0f}};
+    Object mars    {0.0000032f, {1.52f, 0.0f}, {0.0f, 0.81f}, {0.0f, 0.0f}};
+    Object jupiter {0.000954f, {5.2f, 0.0f}, {0.0f, 0.44f}, {0.0f, 0.0f}}; // zoom out to see jupiter
 
-    std::vector<Object*> bodies = {
-        &sun, &mercury, &venus, &earth, &mars, 
-        &jupiter
+    // radiuses not accuarate
+    std::vector<RObject> bodies = {
+        RObject(sun, kRed, 30.0),
+        RObject(mercury, kGray, 8.0),
+        RObject(venus, kYellow, 11.0),
+        RObject(earth, kBlue, 12.0),
+        RObject(mars, kOrange, 10.0),
+        RObject(jupiter, kBrown, 25.0)
     };
 
     Simulation sim(e, r);
     Force none = NullF;
-    for (Object* obj : bodies) {
-        if (obj == &sun) {
-            sim.register_sys(*obj, none);
+    for (RObject& ro : bodies) {
+        if (ro.obj_ == &sun) {
+            sim.register_sys(ro, none);
             continue;
         } 
-        for (Object* other : bodies) {
-            Force g = GravF(*other);
-            if (obj != other) {
-                sim.register_sys(*obj, g);
+        for (RObject& other : bodies) {
+            Force g = GravF(*other.obj_);
+            if (other.obj_ != ro.obj_) {
+                sim.register_sys(ro, g);
             }
         }
     }
+
     sim.start();
     return 0;
 }

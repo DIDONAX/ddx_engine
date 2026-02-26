@@ -3,9 +3,13 @@
 
 Simulation::Simulation(Engine& e, Renderer& r) : engine_(&e), renderer_(&r) {}
 
-void Simulation::register_sys(Object& o, Force& f) {
-    engine_->register_sys(o, f);
+void Simulation::register_sys(RObject& o, Force& f) {
+ 
+    engine_->register_sys(*o.obj_, f);
+
+    scene_.push_back(&o);
 }
+
 void Simulation::start() {
     SDL_Event event;
     bool running = true;
@@ -13,15 +17,28 @@ void Simulation::start() {
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case (SDL_EVENT_QUIT): 
+                case SDL_EVENT_QUIT: 
                     std::println("Simulation Ended");
                     running = false;
                     break;
+                case SDL_EVENT_MOUSE_WHEEL:
+                    if (event.wheel.y > 0) {
+                        renderer_->scale_ *= 1.1f;
+                    } else if (event.wheel.y < 0) {
+                        renderer_->scale_ /= 1.1f;
+                    }
+                break;
                 default:
                     break;
-            }
+            } 
         }
+
         engine_->step();
-        renderer_->render(engine_->get_sys());
+
+        renderer_->clear();
+        for (const auto& o : scene_) {
+            renderer_->draw(*o);
+        }
+        renderer_->render();
     }
 }
